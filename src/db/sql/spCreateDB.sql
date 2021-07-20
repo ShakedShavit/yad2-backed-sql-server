@@ -1,4 +1,0 @@
-CREATE PROCEDURE create_yad2_db
-AS
-CREATE DATABASE Yad2
-GO;
