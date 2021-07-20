@@ -116,3 +116,42 @@ CREATE TABLE ApartmentsToPublishersConnections
 	ApartmentID INT NOT NULL FOREIGN KEY REFERENCES Apartments(ApartmentID),
 	ApartmentPublisherID INT NOT NULL FOREIGN KEY REFERENCES ApartmentPublishers(ApartmentPublisherID)
 )
+
+
+
+
+
+
+
+
+
+
+
+USE Yad2
+
+CREATE TABLE Users
+(
+	UserID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	Email nvarchar(50) NOT NULL UNIQUE,
+	UserPassword nvarchar(50) NOT NULL CHECK (LEN(UserPassword) >= 6),
+	FirstName nvarchar(50) NOT NULL CHECK (LEN(FirstName) >= 1),
+	LastName nvarchar(50) NOT NULL CHECK (LEN(LastName) >= 1),
+	PhoneNumber nvarchar(10) NOT NULL CHECK (LEN(PhoneNumber) = 10 AND LEFT(PhoneNumber, 1) = '0'),
+	DateOfBirth DATETIME2 CHECK (DateOfBirth < CONVERT (date, SYSDATETIME()))
+)
+
+CREATE TABLE TokensToUsersConnections
+(
+	Token varbinary NOT NULL,
+	UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID)
+)
+
+
+INSERT INTO Users (Email, UserPassword, FirstName, LastName, PhoneNumber, DateOfBirth)
+VALUES
+	('a@email.com'),
+	('Abcdef1'),
+	('זסב'),
+	('הנמ'),
+	('43636'),
+	('2021-08-21')
