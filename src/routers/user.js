@@ -1,11 +1,16 @@
 const express = require("express");
-const sql = require("mssql");
 const auth = require("../middleware/auth");
 const { getStrValFromRedis, setStrInRedis } = require("../utils/redis");
 const validateNewUser = require("../middleware/newUserValidation");
-const { addUser } = require("../db/sql/queries/insertRowToTbl");
-const { generateAuthToken, addTokenToDB } = require("../utils/users");
+const { addUser } = require("../db/sql/queries/insert");
+const {
+  generateAuthToken,
+  addTokenToDB,
+  findUserByCredentials,
+  getUserObjForClient,
+} = require("../utils/users");
 const sqlQueryPromise = require("../db/sqlServer");
+const { deleteTokenQuery } = require("../db/sql/queries/delete");
 
 const router = express.Router();
 
@@ -15,14 +20,16 @@ router.get("/", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const user = await User.findByCredentials(
-      req.body.email,
-      req.body.password
-    );
-    const token = await user.generateAuthToken();
+    const user = await findUserByCredentials(req.body.email, req.body.password);
+    const userId = user?.recordset[0]?.UserID;
+    const token = await generateAuthToken(userId);
+    await addTokenToDB(token, userId);
 
-    res.status(200).send({ user, token });
+    res
+      .status(200)
+      .send({ user: getUserObjForClient(user?.recordset[0]), token });
   } catch (err) {
+    console.log(err);
     res.status(400).send(err.message || err);
   }
 });
@@ -30,7 +37,7 @@ router.post("/login", async (req, res) => {
 router.post("/signup", validateNewUser, async (req, res) => {
   try {
     const newUserRecordset = await sqlQueryPromise(
-      addUser(
+      await addUser(
         req.body.email,
         req.body.password,
         req.body.firstName,
@@ -41,11 +48,8 @@ router.post("/signup", validateNewUser, async (req, res) => {
     );
     const userId = newUserRecordset?.recordset[0]?.UserID;
 
-    console.log("USER ID: ", userId);
-
     const token = generateAuthToken(userId);
     await addTokenToDB(token, userId);
-    console.log("TOKEN: ", token);
 
     res.status(201).send({
       user: {
@@ -66,11 +70,7 @@ router.post("/signup", validateNewUser, async (req, res) => {
 
 router.post("/logout", auth, async (req, res) => {
   try {
-    const user = req.user;
-    user.tokens = user.tokens.filter(
-      (tokenObj) => tokenObj.token !== req.token
-    );
-    await user.save();
+    await sqlQueryPromise(deleteTokenQuery(req.token));
     res.status(200).send();
   } catch (err) {
     res.status(500).send(err.message);

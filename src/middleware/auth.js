@@ -1,29 +1,34 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const jwt = require("jsonwebtoken");
+const { isUserAuthQuery } = require("../db/sql/queries/exists");
+const { getUserByIdQuery } = require("../db/sql/queries/select");
+const sqlQueryPromise = require("../db/sqlServer");
 
 const auth = async (req, res, next) => {
-    try {
-        let token = req.query.token == undefined ? req.header("Authorization").replace("Bearer ", "") : req.query.token;
-        const data = jwt.verify(token, process.env.TOKEN_SECRET);
+  try {
+    let token =
+      req.query.token == undefined
+        ? req.header("Authorization").replace("Bearer ", "")
+        : req.query.token;
+    const data = jwt.verify(token, process.env.TOKEN_SECRET);
 
-        const user = await User.findOne({
-            _id: data._id,
-            "tokens.token": token
-        });
+    let user = await sqlQueryPromise(getUserByIdQuery(data._id));
 
-        if (!user) {
-            throw new Error('User not found');
-        }
+    if (!user) throw new Error("User not found");
 
-        req.user = user;
-        req.token = token;
-        next();
-    } catch (err) {
-        res.status(403).send({
-            status: 403,
-            message: "Not authenticated"
-        });
-    }
+    user = user?.recordset[0];
+
+    const isAuthRes = await sqlQueryPromise(isUserAuthQuery(data._id, token));
+    if (!isAuthRes?.recordset[0].isUserAuth) throw new Error("");
+
+    req.user = user;
+    req.token = token;
+    next();
+  } catch (err) {
+    res.status(403).send({
+      status: 403,
+      message: "Not authenticated",
+    });
+  }
 };
 
 module.exports = auth;

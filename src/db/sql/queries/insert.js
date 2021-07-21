@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 const insertApartmentTypes = () => {
   return `
     INSERT INTO ApartmentTypes (Type)
@@ -56,7 +58,7 @@ const insertApartmentProperties = () => {
     `;
 };
 
-const addUser = (
+const addUser = async (
   email,
   password,
   firstName,
@@ -64,28 +66,25 @@ const addUser = (
   phoneNumber,
   dateOfBirth
 ) => {
+  password = await bcrypt.hash(password, 8);
+
   return `
-    INSERT INTO Users (Email, UserPassword, FirstName, LastName, PhoneNumber, DateOfBirth)
-    OUTPUT INSERTED.UserID
-    VALUES
-        (
-            '${email}',
-            '${password}',
-            '${firstName}',
-            '${lastName}',
-            '${phoneNumber}',
-            '${dateOfBirth}'
-        )`;
+    EXEC sp_insert_user
+    '${email}',
+    '${password}',
+    '${firstName}',
+    '${lastName}',
+    '${phoneNumber}',
+    '${dateOfBirth}'
+  `;
 };
 
 const addToken = (token, userId) => {
   return `
-      INSERT INTO TokensToUsersConnections
-      VALUES
-          (
-              '${token}',
-              ${userId}
-          )`;
+    EXEC sp_insert_token
+    '${token}',
+    '${userId}'
+  `;
 };
 
 module.exports = {

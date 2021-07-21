@@ -1,6 +1,6 @@
 // const createDbProc = () => {
 //   return `
-//         CREATE PROCEDURE create_yad2_db
+//         CREATE OR ALTER PROCEDURE create_yad2_db
 //         AS
 //         BEGIN
 //             DECLARE @SQL_SERVER_DB_NAME nvarchar(128)
@@ -25,7 +25,7 @@
 
 // const createCheckIfTblExistsProc = () => {
 //   return `
-//         CREATE PROCEDURE dbo.sp_does_tbl_exist
+//         CREATE OR ALTER PROCEDURE dbo.sp_does_tbl_exist
 //         @tblName nvarchar(128),
 //         @doesExistBool bit OUTPUT
 //         AS

@@ -1,4 +1,11 @@
 const sql = require("mssql");
+const { deleteTokenProc } = require("./sql/procedures/delete");
+const { isUserAuthProc } = require("./sql/procedures/exists");
+const { insertUserProc, insertTokenProc } = require("./sql/procedures/insert");
+const {
+  getUserByEmailProc,
+  getUserByIdProc,
+} = require("./sql/procedures/select");
 const {
   createUsersTbl,
   createTokensToUsersTbl,
@@ -16,7 +23,7 @@ const {
   insertApartmentTypes,
   insertApartmentConditions,
   insertApartmentProperties,
-} = require("./sql/queries/insertRowToTbl");
+} = require("./sql/queries/insert");
 
 // Config for your database
 const config = {
@@ -29,20 +36,27 @@ const config = {
 };
 
 const initializeDB = async () => {
-  await sqlQuery(createUsersTbl());
-  await sqlQuery(createTokensToUsersTbl());
+  sqlQuery(createUsersTbl());
+  sqlQuery(createTokensToUsersTbl());
 
-  await sqlQuery(createApartmentTypesTbl());
-  await sqlQuery(createApartmentConditionsTbl());
-  await sqlQuery(createApartmentPropertiesTbl());
-  await sqlQuery(createApartmentPublishersTbl());
-  await sqlQuery(createApartmentsTbl());
-  await sqlQuery(createApartmentsToPropertiesTbl());
-  await sqlQuery(createApartmentsToPublishersTbl());
-  await sqlQuery(createApartmentsToFilesTbl());
-  await sqlQuery(insertApartmentTypes());
-  await sqlQuery(insertApartmentConditions());
-  await sqlQuery(insertApartmentProperties());
+  // sqlQuery(createApartmentTypesTbl());
+  // sqlQuery(createApartmentConditionsTbl());
+  // sqlQuery(createApartmentPropertiesTbl());
+  // sqlQuery(createApartmentPublishersTbl());
+  // sqlQuery(createApartmentsTbl());
+  // sqlQuery(createApartmentsToPropertiesTbl());
+  // sqlQuery(createApartmentsToPublishersTbl());
+  // sqlQuery(createApartmentsToFilesTbl());
+  // sqlQuery(insertApartmentTypes());
+  // sqlQuery(insertApartmentConditions());
+  // sqlQuery(insertApartmentProperties());
+
+  sqlQuery(insertUserProc());
+  sqlQuery(insertTokenProc());
+  sqlQuery(getUserByEmailProc());
+  sqlQuery(getUserByIdProc());
+  sqlQuery(isUserAuthProc());
+  sqlQuery(deleteTokenProc());
 };
 
 // Connect to your database
@@ -50,6 +64,7 @@ sql.connect(config, async (err) => {
   if (err) {
     console.log(err);
   }
+  await initializeDB();
 
   // // Create Request object
   // const request = new sql.Request();
@@ -79,7 +94,6 @@ sql.connect(config, async (err) => {
   //   // send records as a response
   //   console.log(recordset);
   // });
-  // await initializeDB();
 
   // request.batch(initializeDB(), function (err, recordset) {
   //   if (err) console.log(err);

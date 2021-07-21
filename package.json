@@ -29,5 +29,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShakedShavit/yad2-backed-sql-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ShakedShavit/yad2-backed-sql-server/issues"
+  },
+  "homepage": "https://github.com/ShakedShavit/yad2-backed-sql-server#readme",
   "description": ""
 }
