@@ -1,10 +1,20 @@
 const sql = require("mssql");
 const { deleteTokenProc } = require("./sql/procedures/delete");
 const { isUserAuthProc } = require("./sql/procedures/exists");
-const { insertUserProc, insertTokenProc } = require("./sql/procedures/insert");
+const {
+  insertUserProc,
+  insertTokenProc,
+  insertApartmentProc,
+  insertApartmentTypeConnectionProc,
+  insertApartmentPropertiesConnectionProc,
+  insertPublisherProc,
+  insertApartmentPublishersConnectionProc,
+} = require("./sql/procedures/insert");
 const {
   getUserByEmailProc,
   getUserByIdProc,
+  getApartmentTypeIdProc,
+  getApartmentConditionIdProc,
 } = require("./sql/procedures/select");
 const {
   createUsersTbl,
@@ -17,6 +27,7 @@ const {
   createApartmentsToPropertiesTbl,
   createApartmentsToPublishersTbl,
   createApartmentsToFilesTbl,
+  createApartmentsToTypesTbl,
 } = require("./sql/queries/createTbl");
 
 const {
@@ -36,14 +47,15 @@ const config = {
 };
 
 const initializeDB = async () => {
-  sqlQuery(createUsersTbl());
-  sqlQuery(createTokensToUsersTbl());
+  // sqlQuery(createUsersTbl());
+  // sqlQuery(createTokensToUsersTbl());
 
   // sqlQuery(createApartmentTypesTbl());
   // sqlQuery(createApartmentConditionsTbl());
   // sqlQuery(createApartmentPropertiesTbl());
   // sqlQuery(createApartmentPublishersTbl());
   // sqlQuery(createApartmentsTbl());
+  // sqlQuery(createApartmentsToTypesTbl());
   // sqlQuery(createApartmentsToPropertiesTbl());
   // sqlQuery(createApartmentsToPublishersTbl());
   // sqlQuery(createApartmentsToFilesTbl());
@@ -51,12 +63,18 @@ const initializeDB = async () => {
   // sqlQuery(insertApartmentConditions());
   // sqlQuery(insertApartmentProperties());
 
-  sqlQuery(insertUserProc());
-  sqlQuery(insertTokenProc());
-  sqlQuery(getUserByEmailProc());
-  sqlQuery(getUserByIdProc());
-  sqlQuery(isUserAuthProc());
-  sqlQuery(deleteTokenProc());
+  sqlBatch(insertUserProc());
+  sqlBatch(insertTokenProc());
+  sqlBatch(getUserByEmailProc());
+  sqlBatch(getUserByIdProc());
+  sqlBatch(isUserAuthProc());
+  sqlBatch(deleteTokenProc());
+  sqlBatch(insertApartmentProc());
+  sqlBatch(getApartmentTypeIdProc());
+  sqlBatch(getApartmentConditionIdProc());
+  sqlBatch(insertApartmentPropertiesConnectionProc());
+  sqlBatch(insertPublisherProc());
+  sqlBatch(insertApartmentPublishersConnectionProc());
 };
 
 // Connect to your database

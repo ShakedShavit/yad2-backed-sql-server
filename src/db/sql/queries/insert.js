@@ -58,6 +58,8 @@ const insertApartmentProperties = () => {
     `;
 };
 
+const optionalStr = (str) => (!!str ? `'${str}'` : `NULL`);
+
 const addUser = async (
   email,
   password,
@@ -75,7 +77,7 @@ const addUser = async (
     '${firstName}',
     '${lastName}',
     '${phoneNumber}',
-    '${dateOfBirth}'
+    ${optionalStr(dateOfBirth)}
   `;
 };
 
@@ -87,10 +89,83 @@ const addToken = (token, userId) => {
   `;
 };
 
+const addApartment = ({
+  TypeID,
+  ConditionID,
+  Town,
+  Street,
+  HouseNum,
+  FloorNum,
+  BuildingMaxFloor,
+  NumberOfRooms,
+  NumberOfParkingSpots,
+  NumberOfBalconies,
+  ApartmentDescription,
+  FurnitureDescription,
+  Price,
+  BuiltSqm,
+  TotalSqm,
+  EntranceDate,
+  IsEntranceImmediate,
+  Email,
+  PublisherUserID,
+}) => {
+  return `
+    EXEC sp_insert_apartment
+    '${TypeID}',
+    '${ConditionID}',
+    '${Town}',
+    ${optionalStr(Street)},
+    '${HouseNum}',
+    '${FloorNum}',
+    '${BuildingMaxFloor}',
+    ${NumberOfRooms},
+    '${NumberOfParkingSpots}',
+    '${NumberOfBalconies}',
+    ${optionalStr(ApartmentDescription)},
+    ${optionalStr(FurnitureDescription)},
+    ${Price},
+    ${BuiltSqm},
+    ${TotalSqm},
+    '${EntranceDate}',
+    '${IsEntranceImmediate}',
+    ${optionalStr(Email)},
+    '${PublisherUserID}'
+  `;
+};
+
+const addApartmentToPropertyConnection = (conditionId, apartmentId) => {
+  return `
+    EXEC sp_insert_property_connection
+    '${conditionId}',
+    '${apartmentId}'
+  `;
+};
+
+const addPublisher = (name, phoneNum) => {
+  return `
+    EXEC sp_insert_publisher
+    ${optionalStr(name)},
+    '${phoneNum}'
+  `;
+};
+
+const addApartmentToPublisherConnection = (apartmentId, publisherId) => {
+  return `
+    EXEC sp_insert_publisher_connection
+    '${apartmentId}',
+    '${publisherId}'
+  `;
+};
+
 module.exports = {
   insertApartmentTypes,
   insertApartmentConditions,
   insertApartmentProperties,
   addUser,
   addToken,
+  addApartment,
+  addApartmentToPropertyConnection,
+  addPublisher,
+  addApartmentToPublisherConnection,
 };

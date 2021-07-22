@@ -78,7 +78,7 @@ const createApartmentsTbl = () => {
   ApartmentDescription nvarchar(400),
   FurnitureDescription nvarchar(400),
 
-  Price FLOAT NOT NULL CHECK (Price > 100000),
+  Price FLOAT NOT NULL CHECK (Price >= 100000),
   BuiltSqm FLOAT CHECK (BuiltSqm > 0),
   TotalSqm FLOAT NOT NULL CHECK (TotalSqm > 0),
   EntranceDate DATETIME2 NOT NULL DEFAULT CONVERT (date, SYSDATETIME()) CHECK (EntranceDate >= CONVERT (date, SYSDATETIME())),
@@ -86,6 +86,13 @@ const createApartmentsTbl = () => {
   Email nvarchar(50),
   PublisherUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID) ON DELETE CASCADE`;
   return createNewTable("Apartments", tableColumns);
+};
+
+const createApartmentsToTypesTbl = () => {
+  const tableColumns = `
+  ApartmentID INT NOT NULL FOREIGN KEY REFERENCES Apartments(ApartmentID),
+  ApartmentTypeID INT NOT NULL FOREIGN KEY REFERENCES ApartmentTypes(ApartmentTypeID)`;
+  return createNewTable("ApartmentsToTypesConnections", tableColumns);
 };
 
 const createApartmentsToPropertiesTbl = () => {
@@ -117,6 +124,7 @@ module.exports = {
   createApartmentPropertiesTbl,
   createApartmentPublishersTbl,
   createApartmentsTbl,
+  createApartmentsToTypesTbl,
   createApartmentsToPropertiesTbl,
   createApartmentsToPublishersTbl,
   createApartmentsToFilesTbl,
