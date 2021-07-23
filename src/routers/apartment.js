@@ -190,7 +190,7 @@ const apartmentModelNumFields = [
 router.get(rootRoute, async (req, res) => {
   const apartmentsPollLimit = 5;
   const params = req.query;
-  if (!params.apartmentIds) params.apartmentIds = [];
+  // if (!params.apartmentIds) params.apartmentIds = [];
   if (!params.types) params.types = [];
   if (!params.conditions) params.conditions = [];
 
