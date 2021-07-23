@@ -6,4 +6,15 @@ const isUserAuthQuery = (userId, token) => {
     `;
 };
 
-module.exports = { isUserAuthQuery };
+const validateApartmentQuery = (apartmentId) => {
+  return `
+        DECLARE @doesApartmentExist AS BIT
+        EXEC sp_validate_apartment ${apartmentId}, @doesApartmentExist OUTPUT
+        SELECT doesApartmentExist = @doesApartmentExist
+    `;
+};
+
+module.exports = {
+  isUserAuthQuery,
+  validateApartmentQuery,
+};

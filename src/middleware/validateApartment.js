@@ -1,14 +1,18 @@
-const Apartment = require("../models/apartment");
+const { validateApartmentQuery } = require("../db/sql/queries/exists");
+const sqlQueryPromise = require("../db/sqlServer");
 const formatDateForSql = require("../utils/formatDateForSql");
 
 const validateApartment = async (req, res, next) => {
-  if (!req.query.apartmentId)
+  const apartmentId = req.query.apartmentId;
+  if (!apartmentId)
     return res.status(400).send("Must include apartment's object id");
 
   try {
-    const apartment = await Apartment.findById(req.query.apartmentId);
-    if (!apartment) return res.status(400).send("Apartment was not found");
-    req.apartment = apartment;
+    const doesApartmentExistRes = await sqlQueryPromise(
+      validateApartmentQuery(apartmentId)
+    );
+    if (!doesApartmentExistRes?.recordset[0]?.doesApartmentExist)
+      return res.status(400).send("Apartment was not found");
     next();
   } catch (err) {
     console.log(err);

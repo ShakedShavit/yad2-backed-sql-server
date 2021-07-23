@@ -21,6 +21,7 @@ const {
   addApartmentToPropertyConnection,
   addPublisher,
   addApartmentToPublisherConnection,
+  addApartmentToFileConnection,
 } = require("../db/sql/queries/insert");
 
 const router = express.Router();
@@ -111,18 +112,14 @@ router.post(
       });
     }
 
+    const files = [];
     try {
       for (let reqFile of req.files) {
-        // let file = new FileModel({
-        //   originalName: reqFile.originalname,
-        //   storageName: reqFile.key.split("/")[1],
-        //   bucket: process.env.S3_BUCKET,
-        //   region: process.env.AWS_REGION,
-        //   key: reqFile.key,
-        //   type: reqFile.mimetype,
-        //   owner: req.query.apartmentId,
-        //   isMainFile: isFirstFileOfApartment,
-        // });
+        console.log(reqFile.key);
+        await sqlQueryPromise(
+          addApartmentToFileConnection(req.query.apartmentId, reqFile.key)
+        );
+        files.push(reqFile.key);
       }
 
       res.status(201).send(files);
@@ -133,6 +130,27 @@ router.post(
   }
 );
 
+router.get(rootRoute + "get-file", getFileFromS3, async (req, res) => {
+  try {
+    const stream = Readable.from(req.fileBuffer);
+    //const fileName = req.query.name;
+    const fileName = req.query.key.substring(
+      req.query.key.lastIndexOf("/") + 1
+    );
+
+    if (req.query.download === "true") {
+      res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+    } else {
+      res.setHeader("Content-Disposition", "inline");
+    }
+
+    stream.pipe(res);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
+});
+
 const apartmentModelStrFields = [
   "type",
   "condition",
@@ -142,7 +160,6 @@ const apartmentModelStrFields = [
   "furnitureDescription",
 ];
 const apartmentModelBoolFields = [
-  // 'isStandingOnPolls',
   "hasAirConditioning",
   "hasFurniture",
   "isRenovated",
@@ -156,7 +173,6 @@ const apartmentModelBoolFields = [
   "hasTadiranAc",
   "hasWindowBars",
   "isImmediate",
-  // 'canBeInContactOnWeekends'
 ];
 const apartmentModelNumFields = [
   "houseNum",
@@ -210,7 +226,7 @@ router.get(rootRoute, async (req, res) => {
 
     let field = key.substring(4); // "Omits the min- or max- label"
     if (apartmentModelNumFields.includes(field)) {
-      if (!apartmentModelNumFields.includes(field)) continue; // !! find({ airedAt: { $gte: '1987-10-19', $lte: '1987-10-26' } }). DATE FORMAT
+      if (!apartmentModelNumFields.includes(field)) continue;
 
       if (
         field === "houseNum" ||
@@ -277,27 +293,6 @@ router.get(rootRoute, async (req, res) => {
     res.status(200).send(apartmentObjects || []);
   } catch (err) {
     console.log(err.message, "138");
-    res.status(500).send(err);
-  }
-});
-
-router.get(rootRoute + "get-file", getFileFromS3, async (req, res) => {
-  try {
-    const stream = Readable.from(req.fileBuffer);
-    //const fileName = req.query.name;
-    const fileName = req.query.key.substring(
-      req.query.key.lastIndexOf("/") + 1
-    );
-
-    if (req.query.download === "true") {
-      res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-    } else {
-      res.setHeader("Content-Disposition", "inline");
-    }
-
-    stream.pipe(res);
-  } catch (err) {
-    console.log(err);
     res.status(500).send(err);
   }
 });

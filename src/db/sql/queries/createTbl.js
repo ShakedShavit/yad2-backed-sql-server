@@ -112,7 +112,7 @@ const createApartmentsToPublishersTbl = () => {
 const createApartmentsToFilesTbl = () => {
   const tableColumns = `
   ApartmentID INT NOT NULL FOREIGN KEY REFERENCES Apartments(ApartmentID),
-  FileUrl nvarchar(1024) NOT NULL`;
+  FileKey nvarchar(1024) NOT NULL`;
   return createNewTable("ApartmentsToFilesConnections", tableColumns);
 };
 

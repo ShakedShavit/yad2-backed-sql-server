@@ -1,14 +1,17 @@
 const sql = require("mssql");
 const { deleteTokenProc } = require("./sql/procedures/delete");
-const { isUserAuthProc } = require("./sql/procedures/exists");
+const {
+  isUserAuthProc,
+  validateApartmentProc,
+} = require("./sql/procedures/exists");
 const {
   insertUserProc,
   insertTokenProc,
   insertApartmentProc,
-  insertApartmentTypeConnectionProc,
   insertApartmentPropertiesConnectionProc,
   insertPublisherProc,
   insertApartmentPublishersConnectionProc,
+  insertApartmentFilesConnectionProc,
 } = require("./sql/procedures/insert");
 const {
   getUserByEmailProc,
@@ -75,6 +78,8 @@ const initializeDB = async () => {
   sqlBatch(insertApartmentPropertiesConnectionProc());
   sqlBatch(insertPublisherProc());
   sqlBatch(insertApartmentPublishersConnectionProc());
+  sqlBatch(validateApartmentProc());
+  sqlBatch(insertApartmentFilesConnectionProc());
 };
 
 // Connect to your database

@@ -158,6 +158,14 @@ const addApartmentToPublisherConnection = (apartmentId, publisherId) => {
   `;
 };
 
+const addApartmentToFileConnection = (apartmentId, fileKey) => {
+  return `
+    EXEC sp_insert_file_connection
+    '${apartmentId}',
+    '${fileKey}'
+  `;
+};
+
 module.exports = {
   insertApartmentTypes,
   insertApartmentConditions,
@@ -168,4 +176,5 @@ module.exports = {
   addApartmentToPropertyConnection,
   addPublisher,
   addApartmentToPublisherConnection,
+  addApartmentToFileConnection,
 };
