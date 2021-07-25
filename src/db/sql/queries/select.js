@@ -69,7 +69,7 @@ const getApartments = (
 
   if (MinEntranceDate) MinEntranceDate = formatDateForSql(MinEntranceDate);
   if (MaxEntranceDate) MaxEntranceDate = formatDateForSql(MaxEntranceDate);
-  console.log(MaxEntranceDate);
+
   return `
     EXEC sp_get_apartments
     ${optionalStr(Town)},

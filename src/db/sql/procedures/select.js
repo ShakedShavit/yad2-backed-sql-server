@@ -109,7 +109,14 @@ const getApartmentsProc = () => {
           SET @Where = SUBSTRING(@Where, 0, LEN(@Where) - 3)
 
         DECLARE @Command NVARCHAR(MAX)
-        SET @Command = 'SELECT * FROM Apartments WHERE' + @Where
+        SET @Command = '
+        SELECT Apartments.*, ApartmentTypes.Type, ApartmentConditions.Condition
+        FROM ((Apartments
+        INNER JOIN ApartmentTypes ON Apartments.TypeID = ApartmentTypes.ApartmentTypeID)
+        INNER JOIN ApartmentConditions ON Apartments.ConditionID = ApartmentConditions.ApartmentConditionID)
+        
+        WHERE' + @Where + ' 
+        ORDER BY Apartments.CreatedAt'
         
         Execute SP_ExecuteSQL @Command
 
