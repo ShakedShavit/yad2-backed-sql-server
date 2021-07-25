@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const { optionalStr } = require("../utils");
 
 const insertApartmentTypes = () => {
   return `
@@ -57,8 +58,6 @@ const insertApartmentProperties = () => {
         ('HasWindowBars')
     `;
 };
-
-const optionalStr = (str) => (!!str ? `'${str}'` : `NULL`);
 
 const addUser = async (
   email,

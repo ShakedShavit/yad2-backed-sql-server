@@ -1,23 +1,21 @@
 const express = require("express");
 const Apartment = require("../models/apartment");
 const auth = require("../middleware/auth");
-const FileModel = require("../models/file");
 const { uploadFilesToS3, getFileFromS3 } = require("../middleware/s3-handlers");
 const {
   validateApartment,
   validateNewApartment,
 } = require("../middleware/validateApartment");
 const { Readable } = require("stream");
-const getApartmentObj = require("../utils/getApartmentObj");
 const sqlQueryPromise = require("../db/sqlServer");
 const {
   getApartmentTypeIdQuery,
   getApartmentConditionIdQuery,
   getAllApartmentProperties,
+  getApartments,
 } = require("../db/sql/queries/select");
 const {
   addApartment,
-  addApartmentToTypeConnection,
   addApartmentToPropertyConnection,
   addPublisher,
   addApartmentToPublisherConnection,
@@ -188,109 +186,111 @@ const apartmentModelNumFields = [
 ];
 
 router.get(rootRoute, async (req, res) => {
-  const apartmentsPollLimit = 5;
-  const params = req.query;
-  // if (!params.apartmentIds) params.apartmentIds = [];
-  if (!params.types) params.types = [];
-  if (!params.conditions) params.conditions = [];
-
-  let strAndBoolQueries = [];
-  let numericQueries = [];
-  let orQueries = [];
-
-  for (let [key, value] of Object.entries(params)) {
-    let modelKey;
-    if (
-      apartmentModelStrFields.includes(key) ||
-      apartmentModelBoolFields.includes(key)
-    ) {
-      if (key === "town" || key === "streetName") modelKey = `location.${key}`;
-      else if (key === "isImmediate") modelKey = `entranceDate.${key}`;
-      else modelKey = `properties.${key}`;
-
-      if (key === "description") {
-        strAndBoolQueries.push({
-          [`${modelKey}`]: {
-            $regex: `${value.substring(0, 400)}`,
-          },
-        });
-        continue;
-      }
-
-      strAndBoolQueries.push({
-        [`${modelKey}`]: value,
-      });
-
-      continue;
-    }
-
-    let field = key.substring(4); // "Omits the min- or max- label"
-    if (apartmentModelNumFields.includes(field)) {
-      if (!apartmentModelNumFields.includes(field)) continue;
-
-      if (
-        field === "houseNum" ||
-        field === "floor" ||
-        field === "buildingMaxFloor"
-      )
-        modelKey = `location.${field}`;
-      else if (field === "builtSqm" || field === "totalSqm")
-        modelKey = `size.${field}`;
-      else if (field === "date") modelKey = `entranceDate.${field}`;
-      else if (field === "price") modelKey = field;
-      else modelKey = `properties.${field}`;
-
-      let isMin = key.substring(0, 3) === "min";
-      isMin
-        ? numericQueries.push({
-            [modelKey]: {
-              $gte: value,
-            },
-          })
-        : numericQueries.push({
-            [modelKey]: {
-              $lte: value,
-            },
-          });
-    }
-  }
-
-  for (let type of params.types) {
-    orQueries.push({ type: type });
-  }
-  for (let condition of params.conditions) {
-    orQueries.push({ condition: condition });
-  }
-
   try {
-    const apartments = await Apartment.find({
-      $and: [
-        ...strAndBoolQueries,
-        ...numericQueries,
-        orQueries.length > 0
-          ? {
-              $or: [...orQueries],
-            }
-          : {},
-        {
-          _id: {
-            $nin: [...params.apartmentIds],
-          },
-        },
-      ],
-    }).limit(apartmentsPollLimit);
+    const apartmentsPollLimit = 5;
+    const params = req.query;
 
-    let populateFilesPromises = [];
-    for (apartment of apartments) {
-      populateFilesPromises.push(apartment.populate("files").execPopulate());
-    }
-    await Promise.allSettled(populateFilesPromises);
-    let apartmentObjects = apartments.map((apartment) => ({
-      apartment,
-      files: apartment.files || [],
-    }));
+    const a = await sqlQueryPromise(
+      getApartments(
+        params.town,
+        params.streetName,
+        params.isImmediate,
+        params.description,
+        params.furnitureDescription,
+        params["min-houseNum"],
+        params["max-houseNum"],
+        params["min-floor"],
+        params["max-floor"],
+        params["min-buildingMaxFloor"],
+        params["max-buildingMaxFloor"],
+        params["min-builtSqm"],
+        params["max-builtSqm"],
+        params["min-totalSqm"],
+        params["max-totalSqm"],
+        params["min-price"],
+        params["max-price"],
+        params["min-date"],
+        params["max-date"]
+      )
+    );
+    console.log(a.recordset.length);
 
-    res.status(200).send(apartmentObjects || []);
+    // let query = `SELECT * FROM Apartments WHERE`;
+
+    // const paramsEntries = Object.entries(params);
+    // for (let [key, value] of paramsEntries) {
+    //   switch (key) {
+    //     case "town":
+    //       query += ` Town = ${value} AND`;
+    //       break;
+    //     case "streetName":
+    //       query += ` Street ='${value} AND`;
+    //       break;
+    //     case "isImmediate":
+    //       query += ` IsEntranceImmediate = ${value ? 1 : 0} AND`;
+    //       break;
+    //     case "description":
+    //       query += ` CHARINDEX('${value}', ApartmentDescription) > 0 AND`;
+    //       break;
+    //     case "furnitureDescription":
+    //       query += ` CHARINDEX('${value}', FurnitureDescription) > 0 AND`;
+    //       break;
+    //     case "min-houseNum":
+    //       query += ` HouseNum >= ${value} AND`;
+    //       break;
+    //     case "max-houseNum":
+    //       query += ` HouseNum <= ${value} AND`;
+    //       break;
+    //     case "min-floor":
+    //       query += ` FloorNum >= ${value} AND`;
+    //       break;
+    //     case "max-floor":
+    //       query += ` FloorNum <= ${value} AND`;
+    //       break;
+    //     case "min-buildingMaxFloor":
+    //       query += ` BuildingMaxFloor >= ${value} AND`;
+    //       break;
+    //     case "max-buildingMaxFloor":
+    //       query += ` BuildingMaxFloor <= ${value} AND`;
+    //       break;
+    //     case "min-builtSqm":
+    //       query += ` BuiltSqm >= ${value} AND`;
+    //       break;
+    //     case "max-builtSqm":
+    //       query += ` BuiltSqm <= ${value} AND`;
+    //       break;
+    //     case "min-totalSqm":
+    //       query += ` TotalSqm >= ${value} AND`;
+    //       break;
+    //     case "max-totalSqm":
+    //       query += ` TotalSqm <= ${value} AND`;
+    //       break;
+    //     case "min-date":
+    //       query += ` EntranceDate >= ${formatDateForSql(value)} AND`;
+    //       break; // !Maybe need to cast DATETIME2
+    //     case "max-date":
+    //       query += ` EntranceDate <= ${formatDateForSql(value)} AND`;
+    //       break;
+    //     case "min-price":
+    //       query += ` Price >= ${value} AND`;
+    //       break;
+    //     case "max-price":
+    //       query += ` Price <= ${value} AND`;
+    //       break;
+    //   }
+    // }
+    // console.log(paramsEntries, paramsEntries.length);
+    // const queryLen = query.length;
+    // query =
+    //   paramsEntries.length > 0
+    //     ? query.substring(0, queryLen - 4)
+    //     : query.substring(0, queryLen - 6);
+
+    // console.log(query, "\n");
+    // const a = await sqlQueryPromise(query);
+    // console.log(a.recordset);
+
+    res.status(200).send();
   } catch (err) {
     console.log(err.message, "138");
     res.status(500).send(err);

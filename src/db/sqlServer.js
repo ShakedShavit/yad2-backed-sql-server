@@ -18,6 +18,7 @@ const {
   getUserByIdProc,
   getApartmentTypeIdProc,
   getApartmentConditionIdProc,
+  getApartmentsProc,
 } = require("./sql/procedures/select");
 const {
   createUsersTbl,
@@ -66,20 +67,21 @@ const initializeDB = async () => {
   // sqlQuery(insertApartmentConditions());
   // sqlQuery(insertApartmentProperties());
 
-  sqlBatch(insertUserProc());
-  sqlBatch(insertTokenProc());
-  sqlBatch(getUserByEmailProc());
-  sqlBatch(getUserByIdProc());
-  sqlBatch(isUserAuthProc());
-  sqlBatch(deleteTokenProc());
-  sqlBatch(insertApartmentProc());
-  sqlBatch(getApartmentTypeIdProc());
-  sqlBatch(getApartmentConditionIdProc());
-  sqlBatch(insertApartmentPropertiesConnectionProc());
-  sqlBatch(insertPublisherProc());
-  sqlBatch(insertApartmentPublishersConnectionProc());
-  sqlBatch(validateApartmentProc());
-  sqlBatch(insertApartmentFilesConnectionProc());
+  // sqlBatch(insertUserProc());
+  // sqlBatch(insertTokenProc());
+  // sqlBatch(getUserByEmailProc());
+  // sqlBatch(getUserByIdProc());
+  // sqlBatch(isUserAuthProc());
+  // sqlBatch(deleteTokenProc());
+  // sqlBatch(insertApartmentProc());
+  // sqlBatch(getApartmentTypeIdProc());
+  // sqlBatch(getApartmentConditionIdProc());
+  // sqlBatch(insertApartmentPropertiesConnectionProc());
+  // sqlBatch(insertPublisherProc());
+  // sqlBatch(insertApartmentPublishersConnectionProc());
+  // sqlBatch(validateApartmentProc());
+  // sqlBatch(insertApartmentFilesConnectionProc());
+  sqlBatch(getApartmentsProc());
 };
 
 // Connect to your database
