@@ -13,6 +13,9 @@ const {
   getApartmentConditionIdQuery,
   getAllApartmentProperties,
   getApartments,
+  getAllSpecificApartmentProperties,
+  getAllSpecificApartmentFiles,
+  getAllSpecificApartmentPublishers,
 } = require("../db/sql/queries/select");
 const {
   addApartment,
@@ -21,6 +24,7 @@ const {
   addApartmentToPublisherConnection,
   addApartmentToFileConnection,
 } = require("../db/sql/queries/insert");
+const getApartmentObj = require("../utils/getApartmentObj");
 
 const router = express.Router();
 
@@ -190,7 +194,7 @@ router.get(rootRoute, async (req, res) => {
     const apartmentsPollLimit = 5;
     const params = req.query;
 
-    const a = await sqlQueryPromise(
+    const apartmentsRes = await sqlQueryPromise(
       getApartments(
         params.town,
         params.streetName,
@@ -210,10 +214,40 @@ router.get(rootRoute, async (req, res) => {
         params["min-price"],
         params["max-price"],
         params["min-date"],
-        params["max-date"]
+        params["max-date"],
+        params.types,
+        params.conditions,
+        params.properties,
+        apartmentsPollLimit,
+        params.skipCounter || 0
       )
     );
-    console.log(a.recordset.length);
+
+    const apartments = [];
+    console.log(apartmentsRes.recordset[0], apartmentsRes.recordset.length);
+
+    for (const apartment of apartmentsRes.recordset) {
+      const apartmentId = apartment.ApartmentID;
+
+      const apartmentPropsRes = await sqlQueryPromise(
+        getAllSpecificApartmentProperties(apartmentId)
+      );
+      const apartmentPublishersRes = await sqlQueryPromise(
+        getAllSpecificApartmentPublishers(apartmentId)
+      );
+      const apartmentFilesRes = await sqlQueryPromise(
+        getAllSpecificApartmentFiles(apartmentId)
+      );
+
+      apartments.push({
+        apartment: getApartmentObj(
+          apartment,
+          apartmentPropsRes?.recordset,
+          apartmentPublishersRes?.recordset
+        ),
+        files: apartmentFilesRes?.recordset || [],
+      });
+    }
 
     // let query = `SELECT * FROM Apartments WHERE`;
 
@@ -290,7 +324,7 @@ router.get(rootRoute, async (req, res) => {
     // const a = await sqlQueryPromise(query);
     // console.log(a.recordset);
 
-    res.status(200).send();
+    res.status(200).send(apartments);
   } catch (err) {
     console.log(err.message, "138");
     res.status(500).send(err);

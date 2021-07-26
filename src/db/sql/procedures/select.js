@@ -63,10 +63,15 @@ const getApartmentsProc = () => {
       @MinPrice FLOAT = NULL,
       @MaxPrice FLOAT = NULL,
       @MinEntranceDate DATETIME2 = NULL,
-      @MaxEntranceDate DATETIME2 = NULL
+      @MaxEntranceDate DATETIME2 = NULL,
+      @Types NVARCHAR(MAX) = NULL,
+      @Conditions NVARCHAR(MAX) = NULL,
+      @Properties NVARCHAR(MAX) = NULL,
+      @PollLimit INT = 5,
+      @SkipCounter INT = 0
       AS
         DECLARE @Where NVARCHAR(MAX)
-        SET @Where = ''
+        SET @Where = ' ApartmentID > 0 AND'
 
         IF (@Town IS NOT NULL)
           SET @Where = @Where + ' Town = ''' + @Town + ''' AND'
@@ -74,6 +79,12 @@ const getApartmentsProc = () => {
           SET @Where = @Where + ' Street = ''' + @Street + ''' AND'
         IF (@IsEntranceImmediate IS NOT NULL)
           SET @Where = @Where + ' IsEntranceImmediate = ' + CONVERT(VARCHAR(12), @IsEntranceImmediate) + ' AND'
+
+        IF (@ApartmentDescription IS NOT NULL)
+          SET @Where = @Where + ' CHARINDEX(''' + @ApartmentDescription + ''', ApartmentDescription) > 0 AND'
+        IF (@FurnitureDescription IS NOT NULL)
+          SET @Where = @Where + ' CHARINDEX(''' + @FurnitureDescription + ''', FurnitureDescription) > 0 AND'
+        
 
         IF (@MinHouseNum IS NOT NULL)
           SET @Where = @Where + ' HouseNum >= ' + CONVERT(VARCHAR(12), @MinHouseNum) + ' AND' 
@@ -105,6 +116,26 @@ const getApartmentsProc = () => {
           SET @Where = @Where + ' EntranceDate <= ''' + CONVERT(VARCHAR(50), @MaxEntranceDate) + ''' AND'
 
 
+        IF (@Types IS NOT NULL)
+          SET @Where = @Where + ' CHARINDEX(Type, ''' + @Types + ''') > 0 AND'
+        IF (@Conditions IS NOT NULL)
+          SET @Where = @Where + ' CHARINDEX(Condition, ''' + @Conditions + ''') > 0 AND'
+
+
+        DECLARE @S NVARCHAR(MAX)
+        SET @S = @Properties
+        WHILE LEN(@S) > 0
+        BEGIN
+          SET @Where = @Where + ' 
+            Apartments.ApartmentID IN (SELECT ApartmentsToPropertiesConnections.ApartmentID 
+            FROM ApartmentsToPropertiesConnections 
+            WHERE ApartmentPropertyID = (SELECT ApartmentProperties.ApartmentPropertyID
+            FROM ApartmentProperties
+            WHERE PropertyName = ''' + LEFT(@S, CHARINDEX(',', @S + ',') - 1) + ''')) AND'
+          SET @S = STUFF(@S, 1, CHARINDEX(',', @S+','), '')
+        END
+
+
         IF (RIGHT(@Where, 3) = 'AND')
           SET @Where = SUBSTRING(@Where, 0, LEN(@Where) - 3)
 
@@ -114,9 +145,9 @@ const getApartmentsProc = () => {
         FROM ((Apartments
         INNER JOIN ApartmentTypes ON Apartments.TypeID = ApartmentTypes.ApartmentTypeID)
         INNER JOIN ApartmentConditions ON Apartments.ConditionID = ApartmentConditions.ApartmentConditionID)
-        
-        WHERE' + @Where + ' 
-        ORDER BY Apartments.CreatedAt'
+        WHERE' + @Where + ' ORDER BY Apartments.CreatedAt
+        OFFSET ' + CONVERT(VARCHAR(12), @SkipCounter) + ' ROWS
+        FETCH NEXT ' + CONVERT(VARCHAR(12), @PollLimit) + ' ROWS ONLY'
         
         Execute SP_ExecuteSQL @Command
 
@@ -124,6 +155,48 @@ const getApartmentsProc = () => {
   `;
 };
 // Execute SP_ExecuteSQL @Command
+// @Types NVARCHAR(MAX) = NULL,
+//       @Conditions NVARCHAR(MAX) = NULL,
+
+const getApartmentPropsProc = () => {
+  return `
+      CREATE OR ALTER PROCEDURE dbo.sp_get_apartment_props
+      @ApartmentID NVARCHAR(50)
+      AS
+          SELECT ApartmentProperties.PropertyName
+          FROM ApartmentsToPropertiesConnections
+          INNER JOIN ApartmentProperties
+          ON ApartmentProperties.ApartmentPropertyID = ApartmentsToPropertiesConnections.ApartmentPropertyID
+          WHERE ApartmentID = @ApartmentID
+      RETURN;
+  `;
+};
+
+const getApartmentPublishersProc = () => {
+  return `
+      CREATE OR ALTER PROCEDURE dbo.sp_get_apartment_publishers
+      @ApartmentID NVARCHAR(50)
+      AS
+          SELECT ApartmentPublishers.PublisherName, ApartmentPublishers.PhoneNumber
+          FROM ApartmentsToPublishersConnections
+          INNER JOIN ApartmentPublishers
+          ON ApartmentPublishers.ApartmentPublisherID = ApartmentsToPublishersConnections.ApartmentPublisherID
+          WHERE ApartmentID = @ApartmentID
+      RETURN;
+  `;
+};
+
+const getApartmentFilesProc = () => {
+  return `
+      CREATE OR ALTER PROCEDURE dbo.sp_get_apartment_files
+      @ApartmentID NVARCHAR(50)
+      AS
+          SELECT ApartmentsToFilesConnections.FileKey
+          FROM ApartmentsToFilesConnections
+          WHERE ApartmentID = @ApartmentID
+      RETURN;
+  `;
+};
 
 module.exports = {
   getUserByEmailProc,
@@ -131,6 +204,9 @@ module.exports = {
   getApartmentTypeIdProc,
   getApartmentConditionIdProc,
   getApartmentsProc,
+  getApartmentPropsProc,
+  getApartmentPublishersProc,
+  getApartmentFilesProc,
 };
 
 // SELECT * FROM Apartments WHERE CHARINDEX(@ApartmentDescription, ApartmentDescription) > 0
@@ -139,3 +215,13 @@ module.exports = {
 //           SET @Where = @Where + ' AND CHARINDEX('@ApartmentDescription', ApartmentDescription) > 0'
 //         IF (@FurnitureDescription IS NOT NULL)
 //           SET @Where = @Where + ' AND CHARINDEX('@FurnitureDescription', FurnitureDescription) > 0'
+
+// DECLARE @S NVARCHAR(MAX)
+//     SET @S = @Properties
+//     WHILE LEN(@S) > 0
+//     BEGIN
+//       SET @Where = @Where + ' Apartments.ApartmentID IN (SELECT ApartmentsToPropertiesConnections.ApartmentID FROM ApartmentsToPropertiesConnections WHERE ApartmentPropertyID = ''' +
+//       LEFT(@S, CHARINDEX(',', @S + ',') - 1)
+//       + ''') AND'
+//       SET @S = STUFF(@S, 1, CHARINDEX(',', @S+','), '')
+//     END

@@ -19,6 +19,9 @@ const {
   getApartmentTypeIdProc,
   getApartmentConditionIdProc,
   getApartmentsProc,
+  getApartmentPropsProc,
+  getApartmentPublishersProc,
+  getApartmentFilesProc,
 } = require("./sql/procedures/select");
 const {
   createUsersTbl,
@@ -39,6 +42,7 @@ const {
   insertApartmentConditions,
   insertApartmentProperties,
 } = require("./sql/queries/insert");
+const { getAllSpecificApartmentPublishers } = require("./sql/queries/select");
 
 // Config for your database
 const config = {
@@ -82,6 +86,9 @@ const initializeDB = async () => {
   // sqlBatch(validateApartmentProc());
   // sqlBatch(insertApartmentFilesConnectionProc());
   sqlBatch(getApartmentsProc());
+  sqlBatch(getApartmentPropsProc());
+  sqlBatch(getApartmentPublishersProc());
+  sqlBatch(getApartmentFilesProc());
 };
 
 // Connect to your database
