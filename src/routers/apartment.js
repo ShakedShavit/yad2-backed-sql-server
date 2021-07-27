@@ -1,5 +1,4 @@
 const express = require("express");
-const Apartment = require("../models/apartment");
 const auth = require("../middleware/auth");
 const { uploadFilesToS3, getFileFromS3 } = require("../middleware/s3-handlers");
 const {
@@ -153,46 +152,22 @@ router.get(rootRoute + "get-file", getFileFromS3, async (req, res) => {
   }
 });
 
-const apartmentModelStrFields = [
-  "type",
-  "condition",
-  "town",
-  "streetName",
-  "description",
-  "furnitureDescription",
-];
-const apartmentModelBoolFields = [
-  "hasAirConditioning",
-  "hasFurniture",
-  "isRenovated",
-  "hasSafeRoom",
-  "isAccessible",
-  "hasKosherKitchen",
-  "hasShed",
-  "hasLift",
-  "hasSunHeatedWaterTanks",
-  "hasPandorDoors",
-  "hasTadiranAc",
-  "hasWindowBars",
-  "isImmediate",
-];
-const apartmentModelNumFields = [
-  "houseNum",
-  "floor",
-  "buildingMaxFloor",
-  "numberOfRooms",
-  "numberOfParkingSpots",
-  "numberOfBalconies",
-  "price",
-  "builtSqm",
-  "totalSqm",
-  "date",
-];
+const getPropsArr = async (query) => {
+  const properties = [];
+  const propertiesRes = await sqlQueryPromise(getAllApartmentProperties());
+  propertiesRes?.recordset.forEach((prop) => {
+    const propName = prop.PropertyName;
+    if (query[propName.charAt(0).toLowerCase() + propName.slice(1)] === "true")
+      properties.push(propName);
+  });
+  return properties;
+};
 
 router.get(rootRoute, async (req, res) => {
   try {
     const apartmentsPollLimit = 5;
     const params = req.query;
+    const properties = await getPropsArr({ ...params });
 
     const apartmentsRes = await sqlQueryPromise(
       getApartments(
@@ -217,7 +192,7 @@ router.get(rootRoute, async (req, res) => {
         params["max-date"],
         params.types,
         params.conditions,
-        params.properties,
+        properties,
         apartmentsPollLimit,
         params.skipCounter || 0
       )

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("./db/sqlServer");
+require("./db/redis");
 const userRouter = require("./routers/user");
 const apartmentRouter = require("./routers/apartment");
 

@@ -57,7 +57,6 @@ const config = {
 const initializeDB = async () => {
   // sqlQuery(createUsersTbl());
   // sqlQuery(createTokensToUsersTbl());
-
   // sqlQuery(createApartmentTypesTbl());
   // sqlQuery(createApartmentConditionsTbl());
   // sqlQuery(createApartmentPropertiesTbl());
@@ -70,7 +69,6 @@ const initializeDB = async () => {
   // sqlQuery(insertApartmentTypes());
   // sqlQuery(insertApartmentConditions());
   // sqlQuery(insertApartmentProperties());
-
   // sqlBatch(insertUserProc());
   // sqlBatch(insertTokenProc());
   // sqlBatch(getUserByEmailProc());
@@ -85,10 +83,10 @@ const initializeDB = async () => {
   // sqlBatch(insertApartmentPublishersConnectionProc());
   // sqlBatch(validateApartmentProc());
   // sqlBatch(insertApartmentFilesConnectionProc());
-  sqlBatch(getApartmentsProc());
-  sqlBatch(getApartmentPropsProc());
-  sqlBatch(getApartmentPublishersProc());
-  sqlBatch(getApartmentFilesProc());
+  // sqlBatch(getApartmentsProc());
+  // sqlBatch(getApartmentPropsProc());
+  // sqlBatch(getApartmentPublishersProc());
+  // sqlBatch(getApartmentFilesProc());
 };
 
 // Connect to your database
@@ -96,7 +94,7 @@ sql.connect(config, async (err) => {
   if (err) {
     console.log(err);
   }
-  await initializeDB();
+  // await initializeDB();
 
   // // Create Request object
   // const request = new sql.Request();
