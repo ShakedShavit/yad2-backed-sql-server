@@ -83,7 +83,7 @@ const initializeDB = async () => {
   // sqlBatch(insertApartmentPublishersConnectionProc());
   // sqlBatch(validateApartmentProc());
   // sqlBatch(insertApartmentFilesConnectionProc());
-  // sqlBatch(getApartmentsProc());
+  sqlBatch(getApartmentsProc());
   // sqlBatch(getApartmentPropsProc());
   // sqlBatch(getApartmentPublishersProc());
   // sqlBatch(getApartmentFilesProc());
@@ -94,7 +94,7 @@ sql.connect(config, async (err) => {
   if (err) {
     console.log(err);
   }
-  // await initializeDB();
+  await initializeDB();
 
   // // Create Request object
   // const request = new sql.Request();

@@ -74,52 +74,52 @@ const getApartmentsProc = () => {
         SET @Where = ' ApartmentID > 0 AND'
 
         IF (@Town IS NOT NULL)
-          SET @Where = @Where + ' Town = ''' + @Town + ''' AND'
+          SET @Where = @Where + ' Town=@TownDyn AND'
         IF (@Street IS NOT NULL)
-          SET @Where = @Where + ' Street = ''' + @Street + ''' AND'
+          SET @Where = @Where + ' Street=@StreetDyn AND'
         IF (@IsEntranceImmediate IS NOT NULL)
-          SET @Where = @Where + ' IsEntranceImmediate = ' + CONVERT(VARCHAR(12), @IsEntranceImmediate) + ' AND'
+          SET @Where = @Where + ' IsEntranceImmediate=CONVERT(VARCHAR(12), @IsEntranceImmediateDyn) AND'
 
         IF (@ApartmentDescription IS NOT NULL)
-          SET @Where = @Where + ' CHARINDEX(''' + @ApartmentDescription + ''', ApartmentDescription) > 0 AND'
+          SET @Where = @Where + ' CHARINDEX(@ApartmentDescriptionDyn, ApartmentDescription) > 0 AND'
         IF (@FurnitureDescription IS NOT NULL)
-          SET @Where = @Where + ' CHARINDEX(''' + @FurnitureDescription + ''', FurnitureDescription) > 0 AND'
+          SET @Where = @Where + ' CHARINDEX(@FurnitureDescriptionDyn, FurnitureDescription) > 0 AND'
         
 
         IF (@MinHouseNum IS NOT NULL)
-          SET @Where = @Where + ' HouseNum >= ' + CONVERT(VARCHAR(12), @MinHouseNum) + ' AND' 
+          SET @Where = @Where + ' HouseNum >= CONVERT(VARCHAR(12), @MinHouseNumDyn) AND' 
         IF (@MaxHouseNum IS NOT NULL)
-          SET @Where = @Where + ' HouseNum <= ' + CONVERT(VARCHAR(12), @MaxHouseNum) + ' AND'
+          SET @Where = @Where + ' HouseNum <= CONVERT(VARCHAR(12), @MaxHouseNumDyn) AND'
         IF (@MinFloorNum IS NOT NULL)
-          SET @Where = @Where + ' FloorNum >= ' + CONVERT(VARCHAR(12), @MinFloorNum) + ' AND'
+          SET @Where = @Where + ' FloorNum >= CONVERT(VARCHAR(12), @MinFloorNumDyn) AND'
         IF (@MaxFloorNum IS NOT NULL)
-          SET @Where = @Where + ' FloorNum <= ' + CONVERT(VARCHAR(12), @MaxFloorNum) + ' AND'
+          SET @Where = @Where + ' FloorNum <= CONVERT(VARCHAR(12), @MaxFloorNumDyn) AND'
         IF (@MinBuildingMaxFloor IS NOT NULL)
-          SET @Where = @Where + ' BuildingMaxFloor >= ' + CONVERT(VARCHAR(12), @MinBuildingMaxFloor) + ' AND'
+          SET @Where = @Where + ' BuildingMaxFloor >= CONVERT(VARCHAR(12), @MinBuildingMaxFloorDyn) AND'
         IF (@MaxBuildingMaxFloor IS NOT NULL)
-          SET @Where = @Where + ' BuildingMaxFloor <= ' + CONVERT(VARCHAR(12), @MaxBuildingMaxFloor) + ' AND'
+          SET @Where = @Where + ' BuildingMaxFloor <= CONVERT(VARCHAR(12), @MaxBuildingMaxFloorDyn) AND'
         IF (@MinBuiltSqm IS NOT NULL)
-          SET @Where = @Where + ' BuiltSqm >= ' + CONVERT(VARCHAR(12), @MinBuiltSqm) + ' AND'
+          SET @Where = @Where + ' BuiltSqm >= CONVERT(VARCHAR(12), @MinBuiltSqmDyn) AND'
         IF (@MaxBuiltSqm IS NOT NULL)
-          SET @Where = @Where + ' BuiltSqm <= ' + CONVERT(VARCHAR(12), @MaxBuiltSqm) + ' AND'
+          SET @Where = @Where + ' BuiltSqm <= CONVERT(VARCHAR(12), @MaxBuiltSqmDyn) AND'
         IF (@MinTotalSqm IS NOT NULL)
-          SET @Where = @Where + ' TotalSqm >= ' + CONVERT(VARCHAR(12), @MinTotalSqm) + ' AND'
+          SET @Where = @Where + ' TotalSqm >= CONVERT(VARCHAR(12), @MinTotalSqmDyn) AND'
         IF (@MaxTotalSqm IS NOT NULL)
-          SET @Where = @Where + ' TotalSqm <= ' + CONVERT(VARCHAR(12), @MaxTotalSqm) + ' AND'
+          SET @Where = @Where + ' TotalSqm <= CONVERT(VARCHAR(12), @MaxTotalSqmDyn) AND'
         IF (@MinPrice IS NOT NULL)
-          SET @Where = @Where + ' Price >= ' + CONVERT(VARCHAR(12), @MinPrice) + ' AND'
+          SET @Where = @Where + ' Price >= CONVERT(VARCHAR(12), @MinPriceDyn) AND'
         IF (@MaxPrice IS NOT NULL)
-          SET @Where = @Where + ' Price <= ' + CONVERT(VARCHAR(12), @MaxPrice) + ' AND'
+          SET @Where = @Where + ' Price <= CONVERT(VARCHAR(12), @MaxPriceDyn) AND'
         IF (@MinEntranceDate IS NOT NULL)
-          SET @Where = @Where + ' EntranceDate >= ''' + CONVERT(VARCHAR(50), @MinEntranceDate) + ''' AND'
+          SET @Where = @Where + ' EntranceDate >= CONVERT(VARCHAR(50), @MinEntranceDateDyn) AND'
         IF (@MaxEntranceDate IS NOT NULL)
-          SET @Where = @Where + ' EntranceDate <= ''' + CONVERT(VARCHAR(50), @MaxEntranceDate) + ''' AND'
+          SET @Where = @Where + ' EntranceDate <= CONVERT(VARCHAR(50), @MaxEntranceDateDyn) AND'
 
 
         IF (@Types IS NOT NULL)
-          SET @Where = @Where + ' CHARINDEX(Type, ''' + @Types + ''') > 0 AND'
+          SET @Where = @Where + ' CHARINDEX(Type, @TypesDyn) > 0 AND'
         IF (@Conditions IS NOT NULL)
-          SET @Where = @Where + ' CHARINDEX(Condition, ''' + @Conditions + ''') > 0 AND'
+          SET @Where = @Where + ' CHARINDEX(Condition, @ConditionsDyn) > 0 AND'
 
 
         DECLARE @S NVARCHAR(MAX)
@@ -146,10 +146,59 @@ const getApartmentsProc = () => {
         INNER JOIN ApartmentTypes ON Apartments.TypeID = ApartmentTypes.ApartmentTypeID)
         INNER JOIN ApartmentConditions ON Apartments.ConditionID = ApartmentConditions.ApartmentConditionID)
         WHERE' + @Where + ' ORDER BY Apartments.CreatedAt
-        OFFSET ' + CONVERT(VARCHAR(12), @SkipCounter) + ' ROWS
-        FETCH NEXT ' + CONVERT(VARCHAR(12), @PollLimit) + ' ROWS ONLY'
+        OFFSET CONVERT(INT, @SkipCounterDyn) ROWS
+        FETCH NEXT CONVERT(INT, @PollLimitDyn) ROWS ONLY'
         
-        Execute SP_ExecuteSQL @Command
+        Execute SP_ExecuteSQL @Command, N'
+        @TownDyn NVARCHAR(50),
+        @StreetDyn NVARCHAR(50),
+        @IsEntranceImmediateDyn BIT,
+        @ApartmentDescriptionDyn NVARCHAR(400),
+        @FurnitureDescriptionDyn NVARCHAR(400),
+        @MinHouseNumDyn INT,
+        @MaxHouseNumDyn INT,
+        @MinFloorNumDyn INT,
+        @MaxFloorNumDyn INT,
+        @MinBuildingMaxFloorDyn INT,
+        @MaxBuildingMaxFloorDyn INT,
+        @MinBuiltSqmDyn FLOAT,
+        @MaxBuiltSqmDyn FLOAT,
+        @MinTotalSqmDyn FLOAT,
+        @MaxTotalSqmDyn FLOAT,
+        @MinPriceDyn FLOAT,
+        @MaxPriceDyn FLOAT,
+        @MinEntranceDateDyn DATETIME2,
+        @MaxEntranceDateDyn DATETIME2,
+        @TypesDyn NVARCHAR(MAX),
+        @ConditionsDyn NVARCHAR(MAX),
+        @PropertiesDyn NVARCHAR(MAX),
+        @PollLimitDyn INT,
+        @SkipCounterDyn INT',
+
+        @TownDyn=@Town,
+        @StreetDyn=@Street,
+        @IsEntranceImmediateDyn=@IsEntranceImmediate,
+        @ApartmentDescriptionDyn=@ApartmentDescription,
+        @FurnitureDescriptionDyn=@FurnitureDescription,
+        @MinHouseNumDyn=@MinHouseNum,
+        @MaxHouseNumDyn=@MaxHouseNum,
+        @MinFloorNumDyn=@MinFloorNum,
+        @MaxFloorNumDyn=@MaxFloorNum,
+        @MinBuildingMaxFloorDyn=@MinBuildingMaxFloor,
+        @MaxBuildingMaxFloorDyn=@MaxBuildingMaxFloor,
+        @MinBuiltSqmDyn=@MinBuiltSqm,
+        @MaxBuiltSqmDyn=@MaxBuiltSqm,
+        @MinTotalSqmDyn=@MinTotalSqm,
+        @MaxTotalSqmDyn=@MaxTotalSqm,
+        @MinPriceDyn=@MinPrice,
+        @MaxPriceDyn=@MaxPrice,
+        @MinEntranceDateDyn=@MinEntranceDate,
+        @MaxEntranceDateDyn=@MaxEntranceDate,
+        @TypesDyn=@Types,
+        @ConditionsDyn=@Conditions,
+        @PropertiesDyn=@Properties,
+        @PollLimitDyn=@PollLimit,
+        @SkipCounterDyn=@SkipCounter
 
       RETURN;
   `;

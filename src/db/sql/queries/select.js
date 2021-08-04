@@ -87,7 +87,6 @@ const getApartments = (
   const typesStr = getParamStrFromArr(types);
   const conditionsStr = getParamStrFromArr(conditions);
   let propertiesStr = getParamStrFromArr(properties);
-
   if (!!propertiesStr && propertiesStr[propertiesStr.length - 1])
     propertiesStr = propertiesStr.slice(0, propertiesStr.length - 1);
 
