@@ -1,7 +1,7 @@
 // Users
 
 const createNewTable = (tblName, tableStr) => {
-  return `
+    return `
         CREATE TABLE ${tblName}
         (
             ${tableStr},
@@ -11,7 +11,7 @@ const createNewTable = (tblName, tableStr) => {
 };
 
 const createUsersTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
         UserID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
         Email nvarchar(50) NOT NULL UNIQUE,
         UserPassword nvarchar(100) NOT NULL CHECK (LEN(UserPassword) >= 6),
@@ -19,49 +19,49 @@ const createUsersTbl = () => {
         LastName nvarchar(50) NOT NULL CHECK (LEN(LastName) >= 1),
         PhoneNumber nvarchar(10) NOT NULL CHECK (LEN(PhoneNumber) = 10 AND LEFT(PhoneNumber, 1) = '0'),
         DateOfBirth DATETIME2 CHECK (DateOfBirth < CONVERT (date, SYSDATETIME()))`;
-  return createNewTable("Users", tableColumns);
+    return createNewTable("Users", tableColumns);
 };
 
 const createTokensToUsersTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
         Token nvarchar(400) NOT NULL UNIQUE,
         UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID) ON DELETE CASCADE`;
-  return createNewTable("TokensToUsersConnections", tableColumns);
+    return createNewTable("TokensToUsersConnections", tableColumns);
 };
 
 // Apartments
 
 const createApartmentTypesTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
   ApartmentTypeID INT IDENTITY(1,1) NOT NULL Primary Key,
   Type nvarchar(50) NOT NULL UNIQUE`;
-  return createNewTable("ApartmentTypes", tableColumns);
+    return createNewTable("ApartmentTypes", tableColumns);
 };
 
 const createApartmentConditionsTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
   ApartmentConditionID INT IDENTITY(1,1) NOT NULL Primary Key,
   Condition nvarchar(50) NOT NULL UNIQUE`;
-  return createNewTable("ApartmentConditions", tableColumns);
+    return createNewTable("ApartmentConditions", tableColumns);
 };
 
 const createApartmentPropertiesTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
   ApartmentPropertyID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
   PropertyName nvarchar(50) NOT NULL UNIQUE`;
-  return createNewTable("ApartmentProperties", tableColumns);
+    return createNewTable("ApartmentProperties", tableColumns);
 };
 
 const createApartmentPublishersTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
   ApartmentPublisherID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
   PublisherName nvarchar(50),
   PhoneNumber nvarchar(10) NOT NULL CHECK (LEN(PhoneNumber) = 10 AND LEFT(PhoneNumber, 1) = '0')`;
-  return createNewTable("ApartmentPublishers", tableColumns);
+    return createNewTable("ApartmentPublishers", tableColumns);
 };
 
 const createApartmentsTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
   ApartmentID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
   TypeID INT NOT NULL FOREIGN KEY REFERENCES ApartmentTypes(ApartmentTypeID),
   ConditionID INT NOT NULL FOREIGN KEY REFERENCES ApartmentConditions(ApartmentConditionID),
@@ -85,47 +85,47 @@ const createApartmentsTbl = () => {
   IsEntranceImmediate BIT NOT NULL DEFAULT 0,
   Email nvarchar(50),
   PublisherUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID) ON DELETE CASCADE`;
-  return createNewTable("Apartments", tableColumns);
+    return createNewTable("Apartments", tableColumns);
 };
 
 const createApartmentsToTypesTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
   ApartmentID INT NOT NULL FOREIGN KEY REFERENCES Apartments(ApartmentID),
   ApartmentTypeID INT NOT NULL FOREIGN KEY REFERENCES ApartmentTypes(ApartmentTypeID)`;
-  return createNewTable("ApartmentsToTypesConnections", tableColumns);
+    return createNewTable("ApartmentsToTypesConnections", tableColumns);
 };
 
 const createApartmentsToPropertiesTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
   ApartmentID INT NOT NULL FOREIGN KEY REFERENCES Apartments(ApartmentID),
   ApartmentPropertyID INT NOT NULL FOREIGN KEY REFERENCES ApartmentProperties(ApartmentPropertyID)`;
-  return createNewTable("ApartmentsToPropertiesConnections", tableColumns);
+    return createNewTable("ApartmentsToPropertiesConnections", tableColumns);
 };
 
 const createApartmentsToPublishersTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
   ApartmentID INT NOT NULL FOREIGN KEY REFERENCES Apartments(ApartmentID),
   ApartmentPublisherID INT NOT NULL FOREIGN KEY REFERENCES ApartmentPublishers(ApartmentPublisherID)`;
-  return createNewTable("ApartmentsToPublishersConnections", tableColumns);
+    return createNewTable("ApartmentsToPublishersConnections", tableColumns);
 };
 
 const createApartmentsToFilesTbl = () => {
-  const tableColumns = `
+    const tableColumns = `
   ApartmentID INT NOT NULL FOREIGN KEY REFERENCES Apartments(ApartmentID),
   FileKey nvarchar(1024) NOT NULL`;
-  return createNewTable("ApartmentsToFilesConnections", tableColumns);
+    return createNewTable("ApartmentsToFilesConnections", tableColumns);
 };
 
 module.exports = {
-  createUsersTbl,
-  createTokensToUsersTbl,
-  createApartmentTypesTbl,
-  createApartmentConditionsTbl,
-  createApartmentPropertiesTbl,
-  createApartmentPublishersTbl,
-  createApartmentsTbl,
-  createApartmentsToTypesTbl,
-  createApartmentsToPropertiesTbl,
-  createApartmentsToPublishersTbl,
-  createApartmentsToFilesTbl,
+    createUsersTbl,
+    createTokensToUsersTbl,
+    createApartmentTypesTbl,
+    createApartmentConditionsTbl,
+    createApartmentPropertiesTbl,
+    createApartmentPublishersTbl,
+    createApartmentsTbl,
+    createApartmentsToTypesTbl,
+    createApartmentsToPropertiesTbl,
+    createApartmentsToPublishersTbl,
+    createApartmentsToFilesTbl,
 };

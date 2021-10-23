@@ -1,5 +1,5 @@
 const deleteTokenQuery = (token) => {
-  return `
+    return `
         EXEC sp_delete_token '${token}'
     `;
 };

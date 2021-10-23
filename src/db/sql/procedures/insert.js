@@ -1,5 +1,5 @@
 const insertUserProc = () => {
-  return `
+    return `
         CREATE OR ALTER PROCEDURE dbo.sp_insert_user
         @Email nvarchar(50),
         @UserPassword NVARCHAR(100),
@@ -24,7 +24,7 @@ const insertUserProc = () => {
 };
 
 const insertTokenProc = () => {
-  return `
+    return `
         CREATE OR ALTER PROCEDURE dbo.sp_insert_token
         @Token NVARCHAR(400),
         @UserID INT
@@ -40,7 +40,7 @@ const insertTokenProc = () => {
 };
 
 const insertApartmentProc = () => {
-  return `
+    return `
         CREATE OR ALTER PROCEDURE dbo.sp_insert_apartment
         @TypeID INT,
         @ConditionID INT,
@@ -112,7 +112,7 @@ const insertApartmentProc = () => {
 };
 
 const insertApartmentPropertiesConnectionProc = () => {
-  return `
+    return `
         CREATE OR ALTER PROCEDURE dbo.sp_insert_property_connection
         @ApartmentPropertyID INT,
         @ApartmentID INT
@@ -128,7 +128,7 @@ const insertApartmentPropertiesConnectionProc = () => {
 };
 
 const insertPublisherProc = () => {
-  return `
+    return `
         CREATE OR ALTER PROCEDURE dbo.sp_insert_publisher
         @PublisherName NVARCHAR(50),
         @PhoneNumber NVARCHAR(10)
@@ -145,7 +145,7 @@ const insertPublisherProc = () => {
 };
 
 const insertApartmentPublishersConnectionProc = () => {
-  return `
+    return `
         CREATE OR ALTER PROCEDURE dbo.sp_insert_publisher_connection
         @ApartmentID INT,
         @ApartmentPublisherID INT
@@ -161,7 +161,7 @@ const insertApartmentPublishersConnectionProc = () => {
 };
 
 const insertApartmentFilesConnectionProc = () => {
-  return `
+    return `
         CREATE OR ALTER PROCEDURE dbo.sp_insert_file_connection
         @ApartmentID INT,
         @FileKey NVARCHAR(1024)
@@ -177,11 +177,11 @@ const insertApartmentFilesConnectionProc = () => {
 };
 
 module.exports = {
-  insertUserProc,
-  insertTokenProc,
-  insertApartmentProc,
-  insertApartmentPropertiesConnectionProc,
-  insertPublisherProc,
-  insertApartmentPublishersConnectionProc,
-  insertApartmentFilesConnectionProc,
+    insertUserProc,
+    insertTokenProc,
+    insertApartmentProc,
+    insertApartmentPropertiesConnectionProc,
+    insertPublisherProc,
+    insertApartmentPublishersConnectionProc,
+    insertApartmentFilesConnectionProc,
 };

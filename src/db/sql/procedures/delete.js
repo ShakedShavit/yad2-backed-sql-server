@@ -1,5 +1,5 @@
 const deleteTokenProc = () => {
-  return `
+    return `
       CREATE OR ALTER PROCEDURE dbo.sp_delete_token
       @token NVARCHAR(400)
       AS
@@ -11,5 +11,5 @@ const deleteTokenProc = () => {
 };
 
 module.exports = {
-  deleteTokenProc,
+    deleteTokenProc,
 };

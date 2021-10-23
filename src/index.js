@@ -14,5 +14,5 @@ app.use(userRouter);
 app.use(apartmentRouter);
 
 app.listen(port, () => {
-  console.log("Server connected on port:", port);
+    console.log("Server connected on port:", port);
 });

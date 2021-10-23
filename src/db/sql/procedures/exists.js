@@ -1,5 +1,5 @@
 const isUserAuthProc = () => {
-  return `
+    return `
     CREATE OR ALTER PROCEDURE dbo.sp_is_user_auth
     @userId INT,
     @token NVARCHAR(400),
@@ -15,7 +15,7 @@ const isUserAuthProc = () => {
 };
 
 const validateApartmentProc = () => {
-  return `
+    return `
     CREATE OR ALTER PROCEDURE dbo.sp_validate_apartment
     @ApartmentID INT,
     @doesApartmentExist BIT OUTPUT
@@ -30,6 +30,6 @@ const validateApartmentProc = () => {
 };
 
 module.exports = {
-  isUserAuthProc,
-  validateApartmentProc,
+    isUserAuthProc,
+    validateApartmentProc,
 };

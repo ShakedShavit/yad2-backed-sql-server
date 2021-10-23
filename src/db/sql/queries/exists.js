@@ -1,5 +1,5 @@
 const isUserAuthQuery = (userId, token) => {
-  return `
+    return `
         DECLARE @isUserAuth AS BIT
         EXEC sp_is_user_auth ${userId}, '${token}', @isUserAuth OUTPUT
         SELECT isUserAuth = @isUserAuth
@@ -7,7 +7,7 @@ const isUserAuthQuery = (userId, token) => {
 };
 
 const validateApartmentQuery = (apartmentId) => {
-  return `
+    return `
         DECLARE @doesApartmentExist AS BIT
         EXEC sp_validate_apartment ${apartmentId}, @doesApartmentExist OUTPUT
         SELECT doesApartmentExist = @doesApartmentExist
@@ -15,6 +15,6 @@ const validateApartmentQuery = (apartmentId) => {
 };
 
 module.exports = {
-  isUserAuthQuery,
-  validateApartmentQuery,
+    isUserAuthQuery,
+    validateApartmentQuery,
 };

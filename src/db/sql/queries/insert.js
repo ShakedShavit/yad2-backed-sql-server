@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const { optionalStr } = require("../utils");
 
 const insertApartmentTypes = () => {
-  return `
+    return `
     INSERT INTO ApartmentTypes (Type)
     VALUES
         ('apartment'),
@@ -28,7 +28,7 @@ const insertApartmentTypes = () => {
 };
 
 const insertApartmentConditions = () => {
-  return `
+    return `
     INSERT INTO ApartmentConditions (Condition)
     VALUES
         ('brand-new'),
@@ -40,7 +40,7 @@ const insertApartmentConditions = () => {
 };
 
 const insertApartmentProperties = () => {
-  return `
+    return `
     INSERT INTO ApartmentProperties (PropertyName)
     VALUES
         ('IsStandingOnPolls'),
@@ -59,17 +59,10 @@ const insertApartmentProperties = () => {
     `;
 };
 
-const addUser = async (
-  email,
-  password,
-  firstName,
-  lastName,
-  phoneNumber,
-  dateOfBirth
-) => {
-  password = await bcrypt.hash(password, 8);
+const addUser = async (email, password, firstName, lastName, phoneNumber, dateOfBirth) => {
+    password = await bcrypt.hash(password, 8);
 
-  return `
+    return `
     EXEC sp_insert_user
     '${email}',
     '${password}',
@@ -81,7 +74,7 @@ const addUser = async (
 };
 
 const addToken = (token, userId) => {
-  return `
+    return `
     EXEC sp_insert_token
     '${token}',
     '${userId}'
@@ -89,27 +82,27 @@ const addToken = (token, userId) => {
 };
 
 const addApartment = ({
-  TypeID,
-  ConditionID,
-  Town,
-  Street,
-  HouseNum,
-  FloorNum,
-  BuildingMaxFloor,
-  NumberOfRooms,
-  NumberOfParkingSpots,
-  NumberOfBalconies,
-  ApartmentDescription,
-  FurnitureDescription,
-  Price,
-  BuiltSqm,
-  TotalSqm,
-  EntranceDate,
-  IsEntranceImmediate,
-  Email,
-  PublisherUserID,
+    TypeID,
+    ConditionID,
+    Town,
+    Street,
+    HouseNum,
+    FloorNum,
+    BuildingMaxFloor,
+    NumberOfRooms,
+    NumberOfParkingSpots,
+    NumberOfBalconies,
+    ApartmentDescription,
+    FurnitureDescription,
+    Price,
+    BuiltSqm,
+    TotalSqm,
+    EntranceDate,
+    IsEntranceImmediate,
+    Email,
+    PublisherUserID,
 }) => {
-  return `
+    return `
     EXEC sp_insert_apartment
     '${TypeID}',
     '${ConditionID}',
@@ -134,7 +127,7 @@ const addApartment = ({
 };
 
 const addApartmentToPropertyConnection = (conditionId, apartmentId) => {
-  return `
+    return `
     EXEC sp_insert_property_connection
     '${conditionId}',
     '${apartmentId}'
@@ -142,7 +135,7 @@ const addApartmentToPropertyConnection = (conditionId, apartmentId) => {
 };
 
 const addPublisher = (name, phoneNum) => {
-  return `
+    return `
     EXEC sp_insert_publisher
     ${optionalStr(name)},
     '${phoneNum}'
@@ -150,7 +143,7 @@ const addPublisher = (name, phoneNum) => {
 };
 
 const addApartmentToPublisherConnection = (apartmentId, publisherId) => {
-  return `
+    return `
     EXEC sp_insert_publisher_connection
     '${apartmentId}',
     '${publisherId}'
@@ -158,7 +151,7 @@ const addApartmentToPublisherConnection = (apartmentId, publisherId) => {
 };
 
 const addApartmentToFileConnection = (apartmentId, fileKey) => {
-  return `
+    return `
     EXEC sp_insert_file_connection
     '${apartmentId}',
     '${fileKey}'
@@ -166,14 +159,14 @@ const addApartmentToFileConnection = (apartmentId, fileKey) => {
 };
 
 module.exports = {
-  insertApartmentTypes,
-  insertApartmentConditions,
-  insertApartmentProperties,
-  addUser,
-  addToken,
-  addApartment,
-  addApartmentToPropertyConnection,
-  addPublisher,
-  addApartmentToPublisherConnection,
-  addApartmentToFileConnection,
+    insertApartmentTypes,
+    insertApartmentConditions,
+    insertApartmentProperties,
+    addUser,
+    addToken,
+    addApartment,
+    addApartmentToPropertyConnection,
+    addPublisher,
+    addApartmentToPublisherConnection,
+    addApartmentToFileConnection,
 };

@@ -1,5 +1,5 @@
 const getUserByEmailProc = () => {
-  return `
+    return `
     CREATE OR ALTER PROCEDURE dbo.sp_get_user
     @Email NVARCHAR(50)
     AS
@@ -10,7 +10,7 @@ const getUserByEmailProc = () => {
 };
 
 const getUserByIdProc = () => {
-  return `
+    return `
       CREATE OR ALTER PROCEDURE dbo.sp_get_user_by_id
       @id INT
       AS
@@ -21,7 +21,7 @@ const getUserByIdProc = () => {
 };
 
 const getApartmentTypeIdProc = () => {
-  return `
+    return `
       CREATE OR ALTER PROCEDURE dbo.sp_get_apartment_type
       @type NVARCHAR(50)
       AS
@@ -32,7 +32,7 @@ const getApartmentTypeIdProc = () => {
 };
 
 const getApartmentConditionIdProc = () => {
-  return `
+    return `
       CREATE OR ALTER PROCEDURE dbo.sp_get_apartment_condition
       @condition NVARCHAR(50)
       AS
@@ -43,7 +43,7 @@ const getApartmentConditionIdProc = () => {
 };
 
 const getApartmentsProc = () => {
-  return `
+    return `
       CREATE OR ALTER PROCEDURE dbo.sp_get_apartments
       @Town NVARCHAR(50) = NULL,
       @Street NVARCHAR(50) = NULL,
@@ -208,7 +208,7 @@ const getApartmentsProc = () => {
 //       @Conditions NVARCHAR(MAX) = NULL,
 
 const getApartmentPropsProc = () => {
-  return `
+    return `
       CREATE OR ALTER PROCEDURE dbo.sp_get_apartment_props
       @ApartmentID NVARCHAR(50)
       AS
@@ -222,7 +222,7 @@ const getApartmentPropsProc = () => {
 };
 
 const getApartmentPublishersProc = () => {
-  return `
+    return `
       CREATE OR ALTER PROCEDURE dbo.sp_get_apartment_publishers
       @ApartmentID NVARCHAR(50)
       AS
@@ -236,7 +236,7 @@ const getApartmentPublishersProc = () => {
 };
 
 const getApartmentFilesProc = () => {
-  return `
+    return `
       CREATE OR ALTER PROCEDURE dbo.sp_get_apartment_files
       @ApartmentID NVARCHAR(50)
       AS
@@ -248,14 +248,14 @@ const getApartmentFilesProc = () => {
 };
 
 module.exports = {
-  getUserByEmailProc,
-  getUserByIdProc,
-  getApartmentTypeIdProc,
-  getApartmentConditionIdProc,
-  getApartmentsProc,
-  getApartmentPropsProc,
-  getApartmentPublishersProc,
-  getApartmentFilesProc,
+    getUserByEmailProc,
+    getUserByIdProc,
+    getApartmentTypeIdProc,
+    getApartmentConditionIdProc,
+    getApartmentsProc,
+    getApartmentPropsProc,
+    getApartmentPublishersProc,
+    getApartmentFilesProc,
 };
 
 // SELECT * FROM Apartments WHERE CHARINDEX(@ApartmentDescription, ApartmentDescription) > 0
